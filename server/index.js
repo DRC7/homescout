@@ -12,15 +12,31 @@ import UserLeadMeta from "./models/UserLeadMeta.js";
 
 import { signToken, requireAuth } from "./auth.js";
 
+const isProd = process.env.NODE_ENV === "production";
+
 const app = express();
 
 // ---- Middleware ----
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.CLIENT_ORIGIN,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    credentials: true, // IMPORTANT: allow cookies across origin
+    origin: function (origin, callback) {
+      // allow tools like Postman or server-to-server (no origin)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -206,8 +222,8 @@ app.post("/api/auth/register", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false, // set true when deployed on HTTPS
+      sameSite: isProd ? "none" : "lax",
+      secure: isProd,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -235,8 +251,8 @@ app.post("/api/auth/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false,
+      sameSite: isProd ? "none" : "lax",
+      secure: isProd,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
