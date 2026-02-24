@@ -10,6 +10,8 @@ yarn-error.log*
 .env
 .env.local
 .env.*.local
+server/.env
+client/.env
 
 # Vite
 client/dist/
