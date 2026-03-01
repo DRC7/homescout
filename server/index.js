@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
-
 import bcrypt from "bcryptjs";
 
 import { connectDB } from "./db.js";
@@ -17,22 +16,12 @@ const isProd = process.env.NODE_ENV === "production";
 const app = express();
 
 // ---- Middleware ----
-const allowedOrigins = [
-  "http://localhost:5173",
-  process.env.CLIENT_ORIGIN,
-].filter(Boolean);
-
+// Relaxed CORS for this portfolio app:
+// - origin: true   => reflect any browser Origin in Access-Control-Allow-Origin
+// - credentials: true => allow cookies to be sent
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow tools like Postman or server-to-server (no origin)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: true,
     credentials: true,
   })
 );
@@ -115,8 +104,10 @@ app.get("/api/properties", async (req, res) => {
     // Units filter
     const minU = minUnits !== undefined ? Number(minUnits) : null;
     const maxU = maxUnits !== undefined ? Number(maxUnits) : null;
-    if (minU !== null && !Number.isNaN(minU)) q.units = { ...(q.units || {}), $gte: minU };
-    if (maxU !== null && !Number.isNaN(maxU)) q.units = { ...(q.units || {}), $lte: maxU };
+    if (minU !== null && !Number.isNaN(minU))
+      q.units = { ...(q.units || {}), $gte: minU };
+    if (maxU !== null && !Number.isNaN(maxU))
+      q.units = { ...(q.units || {}), $lte: maxU };
 
     // Price filter
     const minP = minPrice !== undefined ? Number(minPrice) : null;
@@ -128,7 +119,8 @@ app.get("/api/properties", async (req, res) => {
 
     // Condition filter (run-down => higher)
     const cMin = conditionMin !== undefined ? Number(conditionMin) : null;
-    if (cMin !== null && !Number.isNaN(cMin)) q.conditionScore = { $gte: cMin };
+    if (cMin !== null && !Number.isNaN(cMin))
+      q.conditionScore = { $gte: cMin };
 
     // Boolean filters
     if (vacant === "true") q.vacant = true;
@@ -151,10 +143,14 @@ app.get("/api/properties", async (req, res) => {
 
     // Sort (in-memory; fine for now with small datasets)
     if (sort === "price_asc") results.sort((a, b) => a.askingPrice - b.askingPrice);
-    if (sort === "price_desc") results.sort((a, b) => b.askingPrice - a.askingPrice);
+    if (sort === "price_desc")
+      results.sort((a, b) => b.askingPrice - a.askingPrice);
     if (sort === "equity_desc")
-      results.sort((a, b) => (b.estimatedEquity || 0) - (a.estimatedEquity || 0));
-    if (sort === "score_desc") results.sort((a, b) => b.dealScore - a.dealScore);
+      results.sort(
+        (a, b) => (b.estimatedEquity || 0) - (a.estimatedEquity || 0)
+      );
+    if (sort === "score_desc")
+      results.sort((a, b) => b.dealScore - a.dealScore);
 
     res.json({
       results,
@@ -199,16 +195,21 @@ app.post("/api/auth/register", async (req, res) => {
     const { name = "", email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password required" });
     }
     if (String(password).length < 6) {
-      return res.status(400).json({ message: "Password must be 6+ characters" });
+      return res
+        .status(400)
+        .json({ message: "Password must be 6+ characters" });
     }
 
     const normalizedEmail = String(email).toLowerCase().trim();
 
     const existing = await User.findOne({ email: normalizedEmail }).lean();
-    if (existing) return res.status(409).json({ message: "Email already in use" });
+    if (existing)
+      return res.status(409).json({ message: "Email already in use" });
 
     const passwordHash = await bcrypt.hash(String(password), 10);
 
@@ -227,7 +228,9 @@ app.post("/api/auth/register", async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.json({ user: { id: user._id, name: user.name, email: user.email } });
+    res.json({
+      user: { id: user._id, name: user.name, email: user.email },
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
@@ -237,15 +240,24 @@ app.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) return res.status(400).json({ message: "Missing credentials" });
+    if (!email || !password)
+      return res
+        .status(400)
+        .json({ message: "Missing credentials" });
 
     const normalizedEmail = String(email).toLowerCase().trim();
 
     const user = await User.findOne({ email: normalizedEmail });
-    if (!user) return res.status(401).json({ message: "Invalid email or password" });
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Invalid email or password" });
 
     const ok = await bcrypt.compare(String(password), user.passwordHash);
-    if (!ok) return res.status(401).json({ message: "Invalid email or password" });
+    if (!ok)
+      return res
+        .status(401)
+        .json({ message: "Invalid email or password" });
 
     const token = signToken(user);
 
@@ -256,7 +268,9 @@ app.post("/api/auth/login", async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.json({ user: { id: user._id, name: user.name, email: user.email } });
+    res.json({
+      user: { id: user._id, name: user.name, email: user.email },
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
@@ -271,7 +285,9 @@ app.get("/api/auth/me", requireAuth, async (req, res) => {
   const user = await User.findById(req.user.userId).lean();
   if (!user) return res.status(401).json({ message: "Not authenticated" });
 
-  res.json({ user: { id: user._id, name: user.name, email: user.email } });
+  res.json({
+    user: { id: user._id, name: user.name, email: user.email },
+  });
 });
 
 // =====================================================
@@ -318,8 +334,10 @@ app.get("/api/my/leads/:leadId/meta", requireAuth, async (req, res) => {
     const { leadId } = req.params;
 
     const doc =
-      (await UserLeadMeta.findOne({ userId: req.user.userId, leadId }).lean()) ||
-      { leadId, saved: false, status: "new", notes: "" };
+      (await UserLeadMeta.findOne({
+        userId: req.user.userId,
+        leadId,
+      }).lean()) || { leadId, saved: false, status: "new", notes: "" };
 
     res.json({ meta: doc });
   } catch (err) {
@@ -398,4 +416,3 @@ start().catch((err) => {
   console.error("❌ Server failed to start:", err.message);
   process.exit(1);
 });
-
