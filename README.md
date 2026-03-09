@@ -99,7 +99,7 @@ MongoDB Atlas Database
 
 # Project Structure
 
-
+```
 homescout
 │
 ├── client
@@ -117,8 +117,7 @@ homescout
 │
 └── README.md
 
-
----
+```
 
 # API Endpoints
 
@@ -174,7 +173,6 @@ cd homescout
 ---
 
 ## Install dependencies
-
 Server
 
 cd server  
