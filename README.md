@@ -2,7 +2,6 @@
 
 A full‑stack property analysis and lead‑management web application designed for real‑estate investors, wholesalers, and flippers. Built using the **MERN stack**, HomeScout includes secure authentication, multifamily property search, advanced filtering, deal scoring, saved properties, and a CRM workflow with notes and status tracking. All data is backed by **MongoDB**.
 
-This project demonstrates production‑grade engineering patterns and skills expected in modern software engineering roles.
 
 ---
 
