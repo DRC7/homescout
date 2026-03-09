@@ -1,212 +1,250 @@
-# HomeScout — Multifamily Deal Finder & Lead Management Platform (MERN Stack)
+# HomeScout
 
-A full‑stack property analysis and lead‑management web application designed for real‑estate investors, wholesalers, and flippers. Built using the **MERN stack**, HomeScout includes secure authentication, multifamily property search, advanced filtering, deal scoring, saved properties, and a CRM workflow with notes and status tracking. All data is backed by **MongoDB**.
+HomeScout is a full-stack web application that helps real estate investors identify distressed multifamily properties with strong investment potential.
+
+The platform allows users to search and filter properties, analyze potential deals using a scoring system, and save opportunities while tracking notes and status.
+
+This project demonstrates full-stack engineering skills including frontend development, backend API design, authentication, database persistence, and production deployment.
+
+---
+
+# Live Demo
+
+Frontend  
+https://homescout-chi.vercel.app
+
+Backend API  
+https://homescout-kd7t.onrender.com
+
+---
+
+# Screenshots
+
+## Property Search
+![Property Search](./screenshots/search.png)
+
+## Filters
+![Filters](./screenshots/filters.png)
+
+## Property Results
+![Results](./screenshots/results.png)
+
+## Saved Deals
+![Saved Deals](./screenshots/saved.png)
+
+---
+
+# Features
+
+## Property Discovery
+- Search properties by city or address
+- Filter by number of units, price range, condition, vacancy, and auction status
+- Pagination for browsing multiple pages of results
+
+## Deal Analysis
+- Automated deal scoring algorithm
+- Equity estimation
+- Distressed property targeting
+
+## User Accounts
+- Secure authentication
+- JWT based login
+- httpOnly cookie sessions
+
+## Investor Workflow
+- Save promising deals
+- Add notes and track deal status
+- Review saved opportunities in a dashboard
+
+---
+
+# Tech Stack
+
+## Frontend
+React  
+Vite  
+Tailwind CSS  
+
+## Backend
+Node.js  
+Express  
+
+## Database
+MongoDB Atlas  
+
+## Authentication
+JWT  
+httpOnly cookies  
+
+## Deployment
+Frontend: Vercel  
+Backend: Render  
+Database: MongoDB Atlas  
+
+---
+
+# Architecture
+
+User Browser  
+↓  
+React Frontend (Vercel)  
+↓  
+REST API Requests  
+↓  
+Node.js / Express Backend (Render)  
+↓  
+MongoDB Atlas Database
+
+---
+
+# Project Structure
+
+
+homescout
+│
+├── client
+│ ├── src
+│ │ ├── components
+│ │ ├── pages
+│ │ ├── lib
+│ │ └── styles
+│
+├── server
+│ ├── models
+│ ├── routes
+│ ├── auth
+│ └── index.js
+│
+└── README.md
 
 
 ---
 
-## 🚀 Features
+# API Endpoints
 
-### 🔐 Authentication & Authorization
-- Secure login and registration with **JWT stored in httpOnly cookies**
-- Protected backend routes
-- User‑specific saved properties and CRM metadata
+## Properties
 
-### 🏘️ Multifamily Property Search Engine
-- Search by address or city
-- Advanced property filters:
-  - Price range
-  - Units
-  - Vacancy
-  - Auction status
-  - Condition score
-- Backend-powered sorting:
-  - Deal Score
-  - Equity
-  - Price (low → high / high → low)
-- Paginated results
+GET /api/properties  
+Search and filter property deals.
 
-### ⭐ Saved Deals
-- Save and unsave deals tied to the authenticated user
-- Persisted in MongoDB
-- Includes ARV, repairs, equity, and seller information
-
-### 📝 CRM for Each Deal
-- Track lead status: New, Contacted, Negotiating, Offer Made, Under Contract, Closed, Dead Lead
-- Add and edit notes per deal
-- Fully synced to MongoDB
-
-### 📊 Dashboard Analytics
-- Total saved deals
-- Average deal score
-- Average estimated equity
-- Vacant and auction deal counts
-- Count of 5+ unit deals
-- Status breakdown (New → Closed)
+GET /api/properties/:id  
+Retrieve a single property.
 
 ---
 
-## 🧱 Tech Stack
+## Authentication
 
-### Frontend
-- React (Vite)
-- React Router
-- TailwindCSS
-- Context API (Auth state)
-- Reusable components and fetch wrapper
+POST /api/auth/register  
+Create a new user account.
 
-### Backend
-- Node.js / Express
-- MongoDB Atlas + Mongoose
-- JWT (httpOnly cookies)
-- Modular routing structure
-- Clean error handling
+POST /api/auth/login  
+Login user.
 
-### Database
-- MongoDB Atlas
-- Structured models: User, Lead, UserLeadMeta
-- Seeded with realistic multifamily properties for NJ/NY
+POST /api/auth/logout  
+Logout user.
+
+GET /api/auth/me  
+Return current authenticated user.
 
 ---
 
-## 📁 Project Structure
+## User Deals
 
-```
-homescout/
-  client/
-    src/
-      pages/
-        Home.jsx
-        Dashboard.jsx
-        Favorites.jsx
-        Login.jsx
-        Register.jsx
-        PropertyDetails.jsx
-      components/
-        PropertyCard.jsx
-      context/
-        AuthContext.jsx
-      lib/
-        api.js
-      App.jsx
-      main.jsx
-    index.css
+POST /api/my/leads/:leadId/save  
+Save a property.
 
-  server/
-    models/
-      User.js
-      Lead.js
-      UserLeadMeta.js
-    routes/
-      auth.js
-      leads.js
-      userLeads.js
-    db.js
-    index.js
-    seed.js
-```
+DELETE /api/my/leads/:leadId/save  
+Remove saved property.
+
+GET /api/my/saved-deals  
+Retrieve saved deals.
+
+PUT /api/my/leads/:leadId/meta  
+Update notes or status.
 
 ---
 
-## 🔧 Setup Instructions
+# Running the Project Locally
 
-### 1. Clone Repository
-```bash
-git clone <your-repo-url>
+Clone the repository
+
+git clone https://github.com/DRC7/homescout  
 cd homescout
-```
-
-### 2. Install Backend Dependencies
-```bash
-cd server
-npm install
-```
-
-### 3. Install Frontend Dependencies
-```bash
-cd ../client
-npm install
-```
-
-### 4. Create `/server/.env`
-```
-MONGODB_URI=your_mongo_connection_string
-JWT_SECRET=your_long_random_secret
-PORT=5050
-```
-
-### 5. Seed Database
-```bash
-cd server
-node seed.js
-```
-
-### 6. Start Backend
-```bash
-npm run dev
-```
-
-### 7. Start Frontend
-```bash
-cd ../client
-npm run dev
-```
-
-Application runs at **http://localhost:5173**
 
 ---
 
-## 🧪 API Endpoints
+## Install dependencies
 
-### Auth
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Create user |
-| POST | `/api/auth/login` | Login user |
-| POST | `/api/auth/logout` | Logout user |
+Server
 
-### Properties
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/properties` | Search/filter deals |
-| GET | `/api/properties/:id` | Property details |
+cd server  
+npm install  
 
-### User Deals / CRM
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/my/saved-deals` | Get saved deals |
-| POST | `/api/my/leads/:id/save` | Save a deal |
-| DELETE | `/api/my/leads/:id/save` | Unsave a deal |
-| GET | `/api/my/leads/:id/meta` | Fetch CRM metadata |
-| PUT | `/api/my/leads/:id/meta` | Update CRM metadata |
+Client
+
+cd ../client  
+npm install  
 
 ---
 
-## 🎯 Skills Demonstrated
-- Full-stack application architecture
+## Environment Variables
+
+Create a `.env` file inside `/server`
+
+MONGODB_URI=your_mongodb_connection_string  
+JWT_SECRET=your_secret_key  
+CLIENT_ORIGIN=http://localhost:5173  
+
+---
+
+## Run the backend
+
+cd server  
+npm run dev  
+
+---
+
+## Run the frontend
+
+cd client  
+npm run dev  
+
+---
+
+# What This Project Demonstrates
+
+This project highlights important full-stack engineering concepts including:
+
 - REST API design
-- Authentication & authorization (JWT cookies)
-- React component architecture
-- Database design with relational mappings
-- Search, filtering, and sorting logic
-- Real-world SaaS dashboard and CRM patterns
-- Responsive UI/UX using Tailwind
+- secure authentication systems
+- database modeling and persistence
+- frontend state management
+- production deployment and environment configuration
+- debugging real production issues such as CORS and API routing
 
 ---
 
-## 📍 Roadmap (Future Enhancements)
-- Zillow API or MLS data integration
-- Interactive Map Search
-- AI-powered deal scoring engine
-- Email password reset
-- Team accounts with multi-user permissions
-- Deal import/export
-- Kanban-style pipeline
+# Future Improvements
+
+Possible enhancements include:
+
+- integration with real property data sources
+- map based property search
+- ROI and cap rate calculations
+- investor analytics dashboard
+- automated distressed property lead generation
 
 ---
 
-## 📞 Contact
-**Developer:** Dan (New Jersey / New York)  
-**Role Focus:** Full-Stack Engineer, Software Engineer  
-**Open To:** Interviews, take‑home projects, and technical screenings
+# Author
 
+Daniel C
+
+GitHub  
+https://github.com/DRC7
+
+---
+
+# License
+
+MIT
