@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PropertyCard from "../components/PropertyCard";
 import SkeletonCard from "../components/SkeletonCard";
+import { apiFetch } from "../lib/api";
 
 export default function Home() {
   // Results
@@ -63,12 +64,8 @@ export default function Home() {
 
       const params = buildParams(overrides);
       const qs = new URLSearchParams(params).toString();
-      const url = `http://localhost:5050/api/properties?${qs}`;
 
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to load deals");
-
-      const data = await res.json();
+      const data = await apiFetch(`/api/properties?${qs}`);
       setLeads(data.results || []);
       setMeta(data.meta || null);
     } catch (e) {
