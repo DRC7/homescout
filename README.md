@@ -1,248 +1,304 @@
-# HomeScout
+# HomeScout — Full-Stack Multifamily Deal Finder & Investor CRM
 
-HomeScout is a full-stack web application that helps real estate investors identify distressed multifamily properties with strong investment potential.
+HomeScout is a production-deployed MERN application that helps real estate investors identify, evaluate, and manage distressed multifamily property opportunities.
 
-The platform allows users to search and filter properties, analyze potential deals using a scoring system, and save opportunities while tracking notes and status.
+The platform combines **search + filtering**, **deal scoring**, **saved deals**, **CRM-style notes/status tracking**, and **user-specific dashboards** into one workflow-focused product.
 
-This project demonstrates full-stack engineering skills including frontend development, backend API design, authentication, database persistence, and production deployment.
-
----
-
-# Live Demo
-
-Frontend  
-https://homescout-chi.vercel.app
-
-Backend API  
-https://homescout-kd7t.onrender.com
+This project was built to demonstrate the kind of full-stack engineering used in modern SaaS applications: API design, authentication, database modeling, production deployment, and frontend/backend integration.
 
 ---
 
-# Screenshots
+## Live Demo
 
-## Property Search
-![Property Search](./screenshots/search.png)
+**Frontend:** [https://homescout-chi.vercel.app](https://homescout-chi.vercel.app)
 
-## Filters
-![Filters](./screenshots/filters.png)
+**Backend API:** [https://homescout-kd7t.onrender.com/api/health](https://homescout-kd7t.onrender.com/api/health)
 
-## Property Results
-![Results](./screenshots/results.png)
+**GitHub:** [https://github.com/DRC7/homescout](https://github.com/DRC7/homescout)
 
-## Saved Deals
+> Note: the backend is an API service hosted on Render, so visiting the root backend URL may show `Cannot GET /`. The health endpoint above confirms the API is online.
+
+---
+
+## Why This Project Matters
+
+HomeScout is more than a CRUD demo. It shows the ability to:
+
+* build a complete full-stack product from frontend to database
+* design secure authentication with JWT + httpOnly cookies
+* create API-driven filtering, sorting, and pagination
+* manage per-user saved items and metadata in MongoDB
+* debug real deployment issues such as CORS, environment variables, and production API routing
+* ship a working application to the public internet
+
+---
+
+## Features
+
+### Authentication & User Sessions
+
+* Secure registration and login
+* JWT authentication stored in **httpOnly cookies**
+* Protected user-specific routes
+* Persistent account-based saved deals and CRM metadata
+
+### Multifamily Deal Search
+
+* Search by address or city
+* Filter by:
+
+  * min/max units
+  * min/max price
+  * condition score
+  * vacancy
+  * auction status
+* Paginated results
+* Sorting by:
+
+  * deal score
+  * equity
+  * asking price
+
+### Deal Analysis
+
+* Automated deal scoring algorithm
+* Estimated equity display
+* Distressed property targeting
+* Investment-focused listing presentation
+
+### Saved Deals + Investor Workflow
+
+* Save and unsave deals per authenticated user
+* Track deal notes and status
+* CRM-style workflow for managing opportunities
+
+### Dashboard Analytics
+
+* Total saved deals
+* Average deal score
+* Average estimated equity
+* Vacant and auction counts
+* 5+ unit property count
+* Status breakdown across the deal pipeline
+
+---
+
+## Screenshots
+
+### Search Results
+
+![Search Results](./screenshots/search.png)
+
+### Saved Deals
+
 ![Saved Deals](./screenshots/saved.png)
 
----
+### Dashboard
 
-# Features
-
-## Property Discovery
-- Search properties by city or address
-- Filter by number of units, price range, condition, vacancy, and auction status
-- Pagination for browsing multiple pages of results
-
-## Deal Analysis
-- Automated deal scoring algorithm
-- Equity estimation
-- Distressed property targeting
-
-## User Accounts
-- Secure authentication
-- JWT based login
-- httpOnly cookie sessions
-
-## Investor Workflow
-- Save promising deals
-- Add notes and track deal status
-- Review saved opportunities in a dashboard
+![Dashboard](./screenshots/dashboard.png)
 
 ---
 
-# Tech Stack
+## Tech Stack
 
-## Frontend
-React  
-Vite  
-Tailwind CSS  
+### Frontend
 
-## Backend
-Node.js  
-Express  
+* React
+* Vite
+* React Router
+* Tailwind CSS
+* Context API
+* Reusable API helper layer
 
-## Database
-MongoDB Atlas  
+### Backend
 
-## Authentication
-JWT  
-httpOnly cookies  
+* Node.js
+* Express
+* Mongoose
+* CORS + cookie-parser
+* JWT authentication
 
-## Deployment
-Frontend: Vercel  
-Backend: Render  
-Database: MongoDB Atlas  
+### Database
 
----
+* MongoDB Atlas
 
-# Architecture
+### Deployment
 
-User Browser  
-↓  
-React Frontend (Vercel)  
-↓  
-REST API Requests  
-↓  
-Node.js / Express Backend (Render)  
-↓  
-MongoDB Atlas Database
+* Frontend: Vercel
+* Backend: Render
+* Database: MongoDB Atlas
 
 ---
 
-# Project Structure
+## Architecture
 
+```text
+Browser
+  ↓
+React Frontend (Vercel)
+  ↓
+Fetch requests with credentials
+  ↓
+Express API (Render)
+  ↓
+MongoDB Atlas
 ```
-homescout
-│
-├── client
-│ ├── src
-│ │ ├── components
-│ │ ├── pages
-│ │ ├── lib
-│ │ └── styles
-│
-├── server
-│ ├── models
-│ ├── routes
-│ ├── auth
-│ └── index.js
-│
+
+### Core Data Models
+
+* **User** — account credentials and identity
+* **Lead** — multifamily property/deal record
+* **UserLeadMeta** — per-user saved state, notes, and status
+
+---
+
+## Project Structure
+
+```text
+homescout/
+├── client/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── lib/
+│   │   ├── pages/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── index.html
+│   └── package.json
+├── server/
+│   ├── models/
+│   ├── auth.js
+│   ├── db.js
+│   ├── index.js
+│   ├── seed.js
+│   └── package.json
+├── screenshots/
 └── README.md
-
 ```
 
-# API Endpoints
+---
 
-## Properties
+## API Overview
 
-GET /api/properties  
-Search and filter property deals.
+### Auth
 
-GET /api/properties/:id  
-Retrieve a single property.
+| Method | Endpoint             | Purpose                           |
+| ------ | -------------------- | --------------------------------- |
+| POST   | `/api/auth/register` | Create a new user                 |
+| POST   | `/api/auth/login`    | Log in                            |
+| POST   | `/api/auth/logout`   | Log out                           |
+| GET    | `/api/auth/me`       | Return current authenticated user |
+
+### Properties / Deals
+
+| Method | Endpoint              | Purpose                              |
+| ------ | --------------------- | ------------------------------------ |
+| GET    | `/api/properties`     | Search, filter, sort, paginate deals |
+| GET    | `/api/properties/:id` | Fetch single deal details            |
+
+### User Deal Actions
+
+| Method | Endpoint                 | Purpose                                 |
+| ------ | ------------------------ | --------------------------------------- |
+| GET    | `/api/my/saved-deals`    | Return saved deals for the current user |
+| POST   | `/api/my/leads/:id/save` | Save a deal                             |
+| DELETE | `/api/my/leads/:id/save` | Unsave a deal                           |
+| GET    | `/api/my/leads/:id/meta` | Get notes/status for a deal             |
+| PUT    | `/api/my/leads/:id/meta` | Update notes/status for a deal          |
 
 ---
 
-## Authentication
+## Local Development
 
-POST /api/auth/register  
-Create a new user account.
+### 1. Clone the repository
 
-POST /api/auth/login  
-Login user.
-
-POST /api/auth/logout  
-Logout user.
-
-GET /api/auth/me  
-Return current authenticated user.
-
----
-
-## User Deals
-
-POST /api/my/leads/:leadId/save  
-Save a property.
-
-DELETE /api/my/leads/:leadId/save  
-Remove saved property.
-
-GET /api/my/saved-deals  
-Retrieve saved deals.
-
-PUT /api/my/leads/:leadId/meta  
-Update notes or status.
-
----
-
-# Running the Project Locally
-
-Clone the repository
-
-git clone https://github.com/DRC7/homescout  
+```bash
+git clone https://github.com/DRC7/homescout.git
 cd homescout
+```
+
+### 2. Install dependencies
+
+```bash
+cd server
+npm install
+cd ../client
+npm install
+```
+
+### 3. Configure environment variables
+
+Create `server/.env`:
+
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_long_random_secret
+PORT=5050
+CLIENT_ORIGIN=http://localhost:5173
+```
+
+Create `client/.env`:
+
+```env
+VITE_API_BASE_URL=http://localhost:5050
+```
+
+### 4. Seed the database
+
+```bash
+cd server
+node seed.js
+```
+
+### 5. Start the backend
+
+```bash
+cd server
+npm run dev
+```
+
+### 6. Start the frontend
+
+```bash
+cd client
+npm run dev
+```
+
+Frontend runs at **[http://localhost:5173](http://localhost:5173)**.
 
 ---
 
-## Install dependencies
-Server
+## Production Deployment Notes
 
-cd server  
-npm install  
-
-Client
-
-cd ../client  
-npm install  
+* Frontend is deployed on Vercel
+* Backend is deployed on Render
+* MongoDB Atlas stores persistent data
+* Production auth uses cookies with cross-origin requests
+* Environment variables are required for both frontend and backend
 
 ---
 
-## Environment Variables
+## Future Improvements
 
-Create a `.env` file inside `/server`
-
-MONGODB_URI=your_mongodb_connection_string  
-JWT_SECRET=your_secret_key  
-CLIENT_ORIGIN=http://localhost:5173  
-
----
-
-## Run the backend
-
-cd server  
-npm run dev  
+* map-based property search
+* richer deal analytics (ROI, cap rate, rehab estimate)
+* email/password reset
+* AI-assisted deal analysis
+* import/export for investor lead data
+* team accounts and collaboration workflows
 
 ---
 
-## Run the frontend
+## Contact
 
-cd client  
-npm run dev  
+**Daniel C**
 
----
+GitHub: [https://github.com/DRC7](https://github.com/DRC7)
 
-# What This Project Demonstrates
+Email: daniel.cuzco@gmail.com
 
-This project highlights important full-stack engineering concepts including:
+Role Focus: Full-Stack Engineer / Software Engineer
 
-- REST API design
-- secure authentication systems
-- database modeling and persistence
-- frontend state management
-- production deployment and environment configuration
-- debugging real production issues such as CORS and API routing
-
----
-
-# Future Improvements
-
-Possible enhancements include:
-
-- integration with real property data sources
-- map based property search
-- ROI and cap rate calculations
-- investor analytics dashboard
-- automated distressed property lead generation
-
----
-
-# Author
-
-Daniel C
-
-GitHub  
-https://github.com/DRC7
-
----
-
-# License
-
-MIT
+Open to: interviews, take-home projects, and technical screenings
